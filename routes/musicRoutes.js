@@ -3,7 +3,7 @@ const router = express.Router();
 const Artist = require('../models/Music');
 const validateObjectId = require('../middlewares/validateId');
 
-// 1. OBTENER TODOS LOS ARTISTAS (GET)
+// 1. GET ALL ARTISTS
 router.get('/', async (req, res) => {
     try {
         const artists = await Artist.find();
@@ -13,12 +13,12 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 2. OBTENER UN ARTISTA ESPECIFICO POR ID (GET con validacion)
+// 2. GET SPECIFIC ARTIST BY ID (With validation)
 router.get('/:id', validateObjectId, async (req, res) => {
     try {
         const artist = await Artist.findById(req.params.id);
         if (!artist) {
-            return res.status(404).json({ message: 'Artista no encontrado' });
+            return res.status(404).json({ message: 'Artist not found' }); // Traducido
         }
         res.json(artist);
     } catch (err) {
@@ -26,10 +26,11 @@ router.get('/:id', validateObjectId, async (req, res) => {
     }
 });
 
-// 3. CREAR UN NUEVO ARTISTA CON SU ALBUM Y CANCIONES (POST)
+// 3. CREATE A NEW ARTIST (POST)
 router.post('/', async (req, res) => {
+    // Input validation
     if (!req.body.name) {
-        return res.status(400).json({ message: 'El nombre del artista es obligatorio' });
+        return res.status(400).json({ message: 'Artist name is required' }); // Traducido
     }
 
     const artist = new Artist({
