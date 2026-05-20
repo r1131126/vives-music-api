@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-// Esquema 4: Usuarios (Coleccion Principal para Autenticacion)
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -9,7 +9,20 @@ const UserSchema = new mongoose.Schema({
         type: String, 
         enum: ['guest', 'user', 'admin'], 
         default: 'user' 
-    } // Los 3 niveles de acceso exigidos en el documento
+    }
 }, { timestamps: true });
+
+// SCRIPT AUTOMÁTICO: Encripta la contraseña antes de guardar el usuario
+UserSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
 
 module.exports = mongoose.model('User', UserSchema);

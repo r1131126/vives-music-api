@@ -1,21 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-// Conexion a MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Conexion exitosa a MongoDB Atlas'))
-    .catch(err => console.error('Error de conexion:', err));
+    .then(() => console.log('Conectado exitosamente a MongoDB Atlas'))
+    .catch((err) => console.error('Error al conectar a MongoDB:', err));
 
-// IMPORTAR Y USAR RUTAS
 const musicRoutes = require('./routes/musicRoutes');
+const userRoutes = require('./routes/userRoutes'); // Conectamos rutas de usuario
+
 app.use('/api/music', musicRoutes);
+app.use('/api/users', userRoutes); // Añadimos el prefijo /api/users
 
-app.get('/', (req, res) => res.send('API Vives Musica - Servidor Activo'));
+app.get('/', (req, res) => {
+    res.send('API de Vives Music funcionando perfectamente');
+});
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
