@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Artist = require('../models/Music');
 const validateObjectId = require('../middlewares/validateId');
+const authorize = require('../middlewares/auth'); // Importamos el escudo de seguridad
 
-// 1. GET ALL ARTISTS
+// 1. GET ALL ARTISTS (Public: Anyone can view the music)
 router.get('/', async (req, res) => {
     try {
         const artists = await Artist.find();
@@ -13,12 +14,12 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 2. GET SPECIFIC ARTIST BY ID (With validation)
+// 2. GET SPECIFIC ARTIST BY ID (Public: Anyone can view)
 router.get('/:id', validateObjectId, async (req, res) => {
     try {
         const artist = await Artist.findById(req.params.id);
         if (!artist) {
-            return res.status(404).json({ message: 'Artist not found' }); // Traducido
+            return res.status(404).json({ message: 'Artist not found' });
         }
         res.json(artist);
     } catch (err) {
@@ -26,11 +27,10 @@ router.get('/:id', validateObjectId, async (req, res) => {
     }
 });
 
-// 3. CREATE A NEW ARTIST (POST)
-router.post('/', async (req, res) => {
-    // Input validation
+// 3. CREATE A NEW ARTIST (Protected: Only registered 'user' and 'admin' can add music)
+router.post('/', authorize(['user', 'admin']), async (req, res) => {
     if (!req.body.name) {
-        return res.status(400).json({ message: 'Artist name is required' }); // Traducido
+        return res.status(400).json({ message: 'Artist name is required' });
     }
 
     const artist = new Artist({
@@ -47,5 +47,17 @@ router.post('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+// 4. DELETE AN ARTIST (Strictly Protected: ONLY 'admin' can delete)
+router.delete('/:id', validateObjectId, authorize('admin'), async (req, res) => {
+    try {
+        const artist = await Artist.findByIdAndDelete(req.params.id);
+        if (!artist) {
+            return res.status(404).json({ message: 'Artist not found' });
+        }
+        res.json({ message: 'Artist deleted successfully from the database' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
+module.exports = router;
