@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// SCRIPT AUTOMÁTICO: Encripta la contraseña antes de guardar el usuario
+// Encrypt the password before saving the user
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     

@@ -10,7 +10,7 @@ const authorize = (roles = []) => {
         // Get token from header
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            // CAMBIO: Menos técnico. Avisa de que no hay una sesión activa.
+            
             return res.status(401).json({ message: 'Access denied. No active session found' });
         }
 
@@ -28,7 +28,7 @@ const authorize = (roles = []) => {
 
             next();
         } catch (err) {
-            // Avisa de que la sesión ha caducado o no es válida.
+            
             res.status(401).json({ message: 'Your session has expired or is invalid' });
         }
     };

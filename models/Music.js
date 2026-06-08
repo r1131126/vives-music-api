@@ -1,24 +1,24 @@
 const mongoose = require('mongoose');
 
-// Esquema 1: Canciones (Incrustado)
+// Songs 
 const SongSchema = new mongoose.Schema({
     title: { type: String, required: true },
     duration: { type: Number, required: true }, // en segundos
     genre: { type: String }
 });
 
-// Esquema 2: Albumes (Incrustado)
+// Albums 
 const AlbumSchema = new mongoose.Schema({
     title: { type: String, required: true },
     year: { type: Number, required: true },
     songs: [SongSchema] // Array de canciones incrustadas
 });
 
-// Esquema 3: Artistas (Coleccion Principal)
+//  Artists principal colection 
 const ArtistSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true },
     country: { type: String },
-    albums: [AlbumSchema] // Array de albumes incrustados
+    albums: [AlbumSchema] 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Artist', ArtistSchema);
